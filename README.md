@@ -1,0 +1,143 @@
+from pathlib import Path
+import zipfile, os
+
+html = r'''<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="MLP from scratch using NumPy on MNIST — interactive project overview.">
+<title>MLP From Scratch | MNIST</title>
+<style>
+:root{--bg:#080d18;--panel:#101a2b;--line:#233653;--text:#eaf2ff;--muted:#9aacc6;--cyan:#52e0dc;--blue:#779bff;--violet:#bd8cff;--green:#8ee6b0}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#1b3152 0,transparent 55%),var(--bg);color:var(--text);font:16px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
+a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}.wrap{max-width:1100px;margin:auto;padding:28px 22px 70px}
+nav{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:8px 0 28px;color:var(--muted);font-size:.9rem}.brand{font-weight:800;color:var(--text);letter-spacing:.08em}.pill{border:1px solid #31506c;border-radius:999px;padding:5px 12px;color:var(--cyan);font-size:.78rem}
+.hero{text-align:center;padding:54px 0 30px}.eyebrow{color:var(--cyan);letter-spacing:.18em;text-transform:uppercase;font-size:.75rem;font-weight:700}.hero h1{font-size:clamp(2.2rem,6vw,4.4rem);line-height:1.05;margin:16px 0;background:linear-gradient(90deg,#fff,var(--cyan),var(--violet));background-clip:text;color:transparent}.hero p{max-width:700px;margin:0 auto;color:var(--muted);font-size:1.08rem}
+.network-card{margin:36px auto 22px;max-width:900px;border:1px solid #28415e;background:linear-gradient(145deg,#111e31dd,#0b1322ee);border-radius:22px;padding:20px;box-shadow:0 24px 80px #0008;overflow:hidden}
+.network-card svg{width:100%;height:auto;display:block}.edge{stroke:#365271;stroke-width:2;opacity:.7}.pulse{fill:none;stroke:var(--cyan);stroke-width:3;stroke-dasharray:5 16;animation:flow 1.8s linear infinite}.node{fill:#142941;stroke:#65dcd8;stroke-width:2;filter:drop-shadow(0 0 7px #52e0dc66)}.node.alt{stroke:#a88cff}.node.out{stroke:#8ee6b0}.layer-label{fill:#b7c9e4;font-size:14px;font-weight:600}.digit{font:700 27px ui-monospace,monospace;fill:#b6c9e9;opacity:.5;animation:float 4s ease-in-out infinite}.digit:nth-of-type(2n){animation-delay:-2s}@keyframes flow{to{stroke-dashoffset:-42}}@keyframes float{0%,100%{transform:translateY(0);opacity:.25}50%{transform:translateY(-9px);opacity:.8}}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0}.stat,.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}.stat strong{display:block;font-size:1.45rem;color:var(--cyan)}.stat span{color:var(--muted);font-size:.86rem}
+section{margin-top:42px}h2{font-size:1.55rem;margin:0 0 16px}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.card h3{margin:0 0 8px;font-size:1.02rem}.card p{margin:0;color:var(--muted);font-size:.94rem}.tag{display:inline-block;margin:6px 5px 0 0;border:1px solid #34506d;border-radius:7px;padding:3px 8px;color:#b9d9ee;font-size:.78rem}
+.flow{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding:20px;background:#0c1525;border:1px solid var(--line);border-radius:16px}.step{padding:10px 14px;border-radius:10px;background:#162740;border:1px solid #315170;color:#dcecff;font-weight:650}.arrow{color:var(--cyan);font-size:1.2rem}
+pre{white-space:pre-wrap;overflow:auto;background:#070c15;border:1px solid #263951;border-radius:12px;padding:16px;color:#bfe8e3;font-size:.88rem}
+footer{margin-top:50px;padding-top:22px;border-top:1px solid var(--line);color:var(--muted);font-size:.88rem}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.hero{padding-top:30px}.network-card{padding:8px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav><div class="brand">MLP / MNIST</div><span class="pill">NUMPY · FROM SCRATCH</span></nav>
+<header class="hero">
+<div class="eyebrow">Neural Network Project</div>
+<h1>Learning to Recognize<br>Handwritten Digits</h1>
+<p>A Multilayer Perceptron implemented with NumPy, trained on MNIST, and validated with numerical gradient checking.</p>
+</header>
+<div class="network-card" aria-label="Animated neural network showing input, hidden layers and ten output classes">
+<svg viewBox="0 0 860 330" role="img">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#52e0dc"/><stop offset="1" stop-color="#bd8cff"/></linearGradient></defs>
+<g class="digit"><text x="30" y="65">7</text><text x="790" y="70">3</text><text x="50" y="280">8</text><text x="780" y="275">1</text></g>
+<g>
+<path class="edge" d="M110 115 L300 75 M110 115 L300 165 M110 115 L300 255 M110 215 L300 75 M110 215 L300 165 M110 215 L300 255"/>
+<path class="edge" d="M300 75 L520 75 M300 75 L520 165 M300 165 L520 75 M300 165 L520 165 M300 255 L520 165 M300 255 L520 255"/>
+<path class="edge" d="M520 75 L735 55 M520 75 L735 110 M520 165 L735 165 M520 255 L735 220 M520 255 L735 275"/>
+<path class="pulse" d="M110 115 L300 75 L520 75 L735 55 M110 215 L300 165 L520 165 L735 165 M110 215 L300 255 L520 255 L735 275"/>
+</g>
+<g>
+<circle class="node" cx="110" cy="115" r="17"/><circle class="node" cx="110" cy="215" r="17"/>
+<circle class="node alt" cx="300" cy="75" r="19"/><circle class="node alt" cx="300" cy="165" r="19"/><circle class="node alt" cx="300" cy="255" r="19"/>
+<circle class="node alt" cx="520" cy="75" r="19"/><circle class="node alt" cx="520" cy="165" r="19"/><circle class="node alt" cx="520" cy="255" r="19"/>
+<circle class="node out" cx="735" cy="55" r="12"/><circle class="node out" cx="735" cy="110" r="12"/><circle class="node out" cx="735" cy="165" r="12"/><circle class="node out" cx="735" cy="220" r="12"/><circle class="node out" cx="735" cy="275" r="12"/>
+</g>
+<g class="layer-label"><text x="65" y="310">INPUT · 784</text><text x="245" y="310">DENSE · 128</text><text x="465" y="310">DENSE · 64</text><text x="690" y="310">OUTPUT · 10</text></g>
+</svg>
+</div>
+<div class="stats">
+<div class="stat"><strong>784</strong><span>Input features (28 × 28)</span></div>
+<div class="stat"><strong>128 → 64</strong><span>Hidden neurons</span></div>
+<div class="stat"><strong>10</strong><span>Digit classes (0–9)</span></div>
+<div class="stat"><strong>NumPy</strong><span>Core implementation</span></div>
+</div>
+<section>
+<h2>Project overview</h2>
+<p class="muted">This project builds the essential components of a feed-forward neural network without using a machine-learning framework for the core model. NumPy handles matrix operations, while gradients and parameter updates are implemented manually.</p>
+<div class="grid">
+<div class="card"><h3>Dense layers</h3><p>Fully connected transformations using <code>Z = XW + b</code>, with He weight initialization.</p></div>
+<div class="card"><h3>Forward propagation</h3><p>Data passes through dense layers and ReLU activations to produce class probabilities with Softmax.</p></div>
+<div class="card"><h3>Backpropagation</h3><p>The chain rule computes gradients for weights and biases, starting from Softmax plus cross-entropy.</p></div>
+<div class="card"><h3>Mini-batch SGD</h3><p>Shuffled mini-batches are used to calculate gradients and update trainable parameters.</p></div>
+<div class="card"><h3>Gradient checking</h3><p>Analytical derivatives are compared with central finite-difference estimates on a small synthetic batch.</p></div>
+<div class="card"><h3>PyTorch comparison</h3><p>A separate PyTorch model provides a framework-based reference; it is not used by the NumPy model.</p></div>
+</div>
+</section>
+<section>
+<h2>Model data flow</h2>
+<div class="flow"><span class="step">28 × 28 image</span><span class="arrow">→</span><span class="step">Flatten · 784</span><span class="arrow">→</span><span class="step">Dense 128 + ReLU</span><span class="arrow">→</span><span class="step">Dense 64 + ReLU</span><span class="arrow">→</span><span class="step">Dense 10</span><span class="arrow">→</span><span class="step">Softmax</span></div>
+</section>
+<section>
+<h2>Technology stack</h2>
+<span class="tag">Python</span><span class="tag">NumPy</span><span class="tag">MNIST IDX</span><span class="tag">Matplotlib</span><span class="tag">PyTorch comparison</span><span class="tag">Google Colab</span>
+</section>
+<section>
+<h2>Run the project</h2>
+<ol class="muted">
+<li>Open <a href="https://colab.research.google.com/">Google Colab</a>.</li>
+<li>Upload <code>MLP_From_Scratch_MNIST_Bluebook.ipynb</code>.</li>
+<li>Run the notebook cells in order.</li>
+<li>Allow the MNIST files to download when the loader runs.</li>
+<li>Run the NumPy training experiment and review the printed metrics.</li>
+<li>Optionally run the separate PyTorch comparison cell.</li>
+</ol>
+<p class="muted">A GPU is optional. The core NumPy implementation runs on CPU; a GPU runtime does not automatically accelerate NumPy calculations.</p>
+</section>
+<section>
+<h2>Training configuration</h2>
+<pre>Epochs       : 5
+Batch size   : 128
+Learning rate: 0.1
+Architecture : 784 → 128 → 64 → 10
+Optimizer    : Mini-batch SGD
+Loss         : Cross-entropy</pre>
+</section>
+<section>
+<h2>Results</h2>
+<p class="muted">Populate this section with values observed from your own notebook execution. Do not invent accuracy, loss, or runtime.</p>
+<div class="grid">
+<div class="card"><h3>Test accuracy</h3><p>To be filled after execution</p></div>
+<div class="card"><h3>Test loss</h3><p>To be filled after execution</p></div>
+<div class="card"><h3>Gradient-check error</h3><p>To be filled after execution</p></div>
+<div class="card"><h3>Training runtime</h3><p>To be filled after execution</p></div>
+</div>
+</section>
+<section>
+<h2>Repository files</h2>
+<pre>MLP-From-Scratch-MNIST/
+├── MLP_From_Scratch_MNIST_Bluebook.ipynb
+├── README.md
+└── index.html   # Animated project overview</pre>
+</section>
+<footer>
+<strong>Academic project:</strong> Multilayer Perceptron (MLP) From Scratch Using MNIST<br>
+<strong>Student:</strong> Add your name &nbsp;·&nbsp; <strong>Roll No.:</strong> Add your roll number<br>
+<span>Built for learning the fundamentals of neural-network training.</span>
+</footer>
+</div>
+</body>
+</html>'''
+
+html_path = "/mnt/data/MLP_MNIST_Animated_Project_Overview.html"
+Path(html_path).write_text(html, encoding="utf-8")
+
+zip_path = "/mnt/data/MLP_MNIST_Animated_Project_Files.zip"
+with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
+    z.writestr("index.html", html)
+    z.writestr("README.md", """# MLP From Scratch Using MNIST
+
+See `index.html` for the animated HTML/CSS/SVG project overview (no GIF or video).
+
+Core implementation: `MLP_From_Scratch_MNIST_Bluebook.ipynb` (download separately from the project conversation).
+
+Open `index.html` in a browser to view the animated overview. For GitHub Pages, place `index.html` in the repository root and enable Pages for the branch.
+""")
+print("Created:", html_path, os.path.getsize(html_path), "bytes")
+print("Created:", zip_path, os.path.getsize(zip_path), "bytes")
