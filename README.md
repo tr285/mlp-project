@@ -2,6 +2,26 @@
 
 > **A neural-network implementation built with NumPy to understand the internal working of a Multilayer Perceptron — from forward propagation and backpropagation to training and evaluation.**
 
+
+
+## 🚀 Interactive Project Visualization
+
+Explore the animated neural network architecture and project overview.
+
+<p align="center">
+  <a href="https://YOUR-USERNAME.github.io/YOUR-REPOSITORY/">
+    <img src="https://img.shields.io/badge/Explore-Animated%20Project-00D9D0?style=for-the-badge&logo=github" alt="Explore Animated Project"/>
+  </a>
+</p>
+
+**The interactive visualization includes:**
+- Animated neural network connections
+- Input, hidden and output layers
+- Data flow visualization
+- MLP architecture overview
+
+[🌐 View Animated Project](https://tr285.github.io/MLP_MNIST_Animated_Project_Overview/)
+
 ## Project Information
 
 | Field | Details |
@@ -12,11 +32,6 @@
 | Main implementation | Python and NumPy |
 | Comparison implementation | PyTorch (separate experiment) |
 | Network architecture | 784 → 128 → 64 → 10 |
-
-**Student name:** `Your Name`  
-**Roll number:** `Your Roll Number`  
-**College / Department:** `Your College and Department`  
-**Academic year:** `Your Academic Year`
 
 ---
 
