@@ -1,143 +1,421 @@
+[README (2).md](https://github.com/user-attachments/files/34814901/README.2.md)
+# Multilayer Perceptron (MLP) From Scratch Using MNIST
+
+> **A neural-network implementation built with NumPy to understand the internal working of a Multilayer Perceptron — from forward propagation and backpropagation to training and evaluation.**
+
+## Project Information
+
+| Field | Details |
+|---|---|
+| Project title | Multilayer Perceptron (MLP) From Scratch Using MNIST |
+| Project type | Academic / Machine Learning |
+| Dataset | MNIST handwritten digits |
+| Main implementation | Python and NumPy |
+| Comparison implementation | PyTorch (separate experiment) |
+| Network architecture | 784 → 128 → 64 → 10 |
+
+**Student name:** `Your Name`  
+**Roll number:** `Your Roll Number`  
+**College / Department:** `Your College and Department`  
+**Academic year:** `Your Academic Year`
+
+---
+
+## 1. Project Overview
+
+This project implements a **Multilayer Perceptron (MLP)** neural network from scratch using Python and NumPy. The model is trained on the MNIST handwritten-digit dataset to classify grayscale images into one of ten digit classes, from 0 to 9.
+
+The main purpose is educational: instead of relying on a machine-learning framework to construct and train the primary model, the project manually implements the important neural-network operations. These include dense layers, activation functions, forward propagation, loss calculation, backpropagation, gradient calculation, and mini-batch Stochastic Gradient Descent (SGD).
+
+A separate PyTorch implementation is used as a reference comparison. It is not used to implement or train the NumPy model.
+
+## 2. Problem Statement
+
+Handwritten digit recognition is a classification problem in which a computer must identify the digit represented by an image. Handwritten digits can differ in shape, size, stroke thickness, and writing style, which makes classification more challenging than matching an image against a fixed template.
+
+Machine-learning libraries provide ready-made layers, loss functions, and automatic differentiation. Although these tools are useful, using them without understanding their internal operations can make it difficult for a student to understand how a neural network learns.
+
+**The problem addressed by this project is to build and train a handwritten-digit classifier while implementing the fundamental operations of an MLP manually, using NumPy, and validating the correctness of its gradients.**
+
+## 3. Proposed Solution
+
+The project uses a fully connected feed-forward neural network with two hidden layers.
+
+1. Load the MNIST images and labels.
+2. Flatten each 28 × 28 grayscale image into a vector of 784 values.
+3. Normalize pixel values to the range 0 to 1.
+4. Pass the input through three dense layers.
+5. Apply ReLU activation to the two hidden layers.
+6. Calculate class probabilities using Softmax.
+7. Calculate the classification loss using cross-entropy.
+8. Compute gradients through manual backpropagation.
+9. Update weights and biases using mini-batch SGD.
+10. Evaluate the trained model on the test dataset.
+
+The project also performs numerical gradient checking on a small synthetic dataset to compare analytical gradients from backpropagation with numerical approximations.
+
+## 4. Project Objectives
+
+- Understand the structure and working of a Multilayer Perceptron.
+- Implement fully connected (dense) layers using NumPy.
+- Implement forward propagation and backward propagation manually.
+- Understand and use the ReLU activation function.
+- Implement numerically stable Softmax and cross-entropy calculations.
+- Train the network using mini-batch Stochastic Gradient Descent.
+- Load and preprocess the MNIST dataset.
+- Verify gradients using numerical gradient checking.
+- Evaluate classification performance on unseen test images.
+- Compare the NumPy implementation with a separate PyTorch model.
+
+## 5. Dataset: MNIST
+
+MNIST is a handwritten-digit image dataset containing grayscale images of digits from 0 to 9.
+
+| Property | Description |
+|---|---|
+| Image dimensions | 28 × 28 pixels |
+| Image channels | 1 (grayscale) |
+| Input features after flattening | 784 |
+| Number of classes | 10 |
+| Class labels | 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 |
+| Training set | 60,000 images |
+| Test set | 10,000 images |
+
+### Preprocessing
+
+- Convert each image into a one-dimensional vector containing 784 pixel values.
+- Convert pixel values from the unsigned 8-bit range (0–255) to floating-point values.
+- Normalize pixels by dividing by 255.
+- Keep labels as integer class values from 0 to 9.
+
+The NumPy data loader reads the compressed MNIST IDX files directly. Therefore, the core NumPy implementation does not require a machine-learning dataset library to load MNIST.
+
+## 6. System Architecture
+
+### 6.1 Neural Network Architecture
+
+The model contains one input layer, two hidden layers, and one output layer.
+
+```text
+                 MNIST INPUT IMAGE
+                    28 × 28
+                       |
+                       v
+              Flatten: 784 features
+                       |
+                       v
+              +------------------+
+              |  Input: 784      |
+              +------------------+
+                       |
+                       v
+              +------------------+
+              | Dense Layer 1    |
+              | 784 → 128        |
+              | ReLU             |
+              +------------------+
+                       |
+                       v
+              +------------------+
+              | Dense Layer 2    |
+              | 128 → 64         |
+              | ReLU             |
+              +------------------+
+                       |
+                       v
+              +------------------+
+              | Output Layer     |
+              | 64 → 10          |
+              | Softmax          |
+              +------------------+
+                       |
+                       v
+              Predicted digit: 0–9
+```
+
+### 6.2 Layer Description
+
+| Layer | Input size | Output size | Operation |
+|---|---:|---:|---|
+| Input | — | 784 | Flattened image |
+| Dense 1 | 784 | 128 | Fully connected + ReLU |
+| Dense 2 | 128 | 64 | Fully connected + ReLU |
+| Output | 64 | 10 | Fully connected + Softmax |
+
+The dense layer computes:
+
+\[
+Z = XW + b
+\]
+
+where `X` is the input, `W` is the weight matrix, and `b` is the bias vector.
+
+### 6.3 Training Workflow
+
+```mermaid
+flowchart TD
+    A[Load MNIST Dataset] --> B[Preprocess Images and Labels]
+    B --> C[Initialize Weights and Biases]
+    C --> D[Forward Propagation]
+    D --> E[Calculate Cross-Entropy Loss]
+    E --> F[Backpropagation]
+    F --> G[Update Parameters Using Mini-Batch SGD]
+    G --> H{More Training Batches or Epochs?}
+    H -- Yes --> D
+    H -- No --> I[Evaluate on Test Dataset]
+    I --> J[Report Test Loss and Accuracy]
+```
+
+## 7. Important Concepts Implemented
+
+### 7.1 Dense Layer
+
+A dense layer connects every input feature to every neuron in the next layer. It performs a matrix multiplication followed by the addition of a bias vector.
+
+\[
+Z = XW + b
+\]
+
+Weights are initialized using He initialization because the hidden layers use ReLU activation.
+
+### 7.2 Forward Propagation
+
+Forward propagation passes input data through the network to generate predictions.
+
+- Dense transformation
+- ReLU activation
+- Dense transformation
+- ReLU activation
+- Output logits
+- Softmax probabilities
+
+### 7.3 ReLU Activation
+
+ReLU introduces non-linearity into the network.
+
+\[
+ReLU(z) = \max(0,z)
+\]
+
+It returns zero for negative inputs and keeps positive inputs unchanged.
+
+### 7.4 Softmax and Cross-Entropy
+
+Softmax converts output logits into class probabilities. The probabilities for each image sum to approximately one.
+
+Cross-entropy measures the difference between the predicted class probabilities and the correct labels. The implementation subtracts the maximum logit before exponentiation for numerical stability.
+
+### 7.5 Backpropagation
+
+Backpropagation calculates gradients of the loss with respect to the model's weights and biases using the chain rule. These gradients are propagated from the output layer back through the hidden layers.
+
+### 7.6 Mini-Batch Stochastic Gradient Descent
+
+The training data is divided into small batches. For each batch, the model performs forward propagation, calculates the loss, computes gradients, and updates its parameters.
+
+\[
+\theta \leftarrow \theta - \eta \nabla_{\theta}L
+\]
+
+Here, `θ` represents model parameters, `η` is the learning rate, and `L` is the loss.
+
+### 7.7 Numerical Gradient Checking
+
+Gradient checking compares the analytical gradient calculated by backpropagation with a numerical central-difference estimate:
+
+\[
+\frac{L(\theta+\epsilon)-L(\theta-\epsilon)}{2\epsilon}
+\]
+
+A small relative error indicates that the analytical and numerical gradients are consistent. This check is performed on a small synthetic batch rather than the full MNIST dataset.
+
+## 8. Technologies and Libraries
+
+| Technology / Library | Purpose |
+|---|---|
+| Python | Main programming language |
+| NumPy | Matrix operations, parameter storage, forward pass, backpropagation, and training |
+| `gzip` | Reading compressed MNIST files |
+| `struct` | Parsing MNIST IDX file headers |
+| `urllib.request` | Downloading MNIST files |
+| `pathlib` | Managing dataset paths |
+| PyTorch | Separate reference implementation for comparison |
+| Google Colab / Jupyter Notebook | Running the notebook-based experiment |
+
+**Important:** The primary MLP is implemented using NumPy. PyTorch is only used in the separate comparison experiment; it does not perform automatic differentiation for the NumPy model.
+
+## 9. Important Python Imports
+
+The core NumPy implementation uses Python's standard library and NumPy:
+
+```python
+import gzip
+import struct
+import urllib.request
 from pathlib import Path
-import zipfile, os
 
-html = r'''<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="MLP from scratch using NumPy on MNIST — interactive project overview.">
-<title>MLP From Scratch | MNIST</title>
-<style>
-:root{--bg:#080d18;--panel:#101a2b;--line:#233653;--text:#eaf2ff;--muted:#9aacc6;--cyan:#52e0dc;--blue:#779bff;--violet:#bd8cff;--green:#8ee6b0}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#1b3152 0,transparent 55%),var(--bg);color:var(--text);font:16px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
-a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}.wrap{max-width:1100px;margin:auto;padding:28px 22px 70px}
-nav{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:8px 0 28px;color:var(--muted);font-size:.9rem}.brand{font-weight:800;color:var(--text);letter-spacing:.08em}.pill{border:1px solid #31506c;border-radius:999px;padding:5px 12px;color:var(--cyan);font-size:.78rem}
-.hero{text-align:center;padding:54px 0 30px}.eyebrow{color:var(--cyan);letter-spacing:.18em;text-transform:uppercase;font-size:.75rem;font-weight:700}.hero h1{font-size:clamp(2.2rem,6vw,4.4rem);line-height:1.05;margin:16px 0;background:linear-gradient(90deg,#fff,var(--cyan),var(--violet));background-clip:text;color:transparent}.hero p{max-width:700px;margin:0 auto;color:var(--muted);font-size:1.08rem}
-.network-card{margin:36px auto 22px;max-width:900px;border:1px solid #28415e;background:linear-gradient(145deg,#111e31dd,#0b1322ee);border-radius:22px;padding:20px;box-shadow:0 24px 80px #0008;overflow:hidden}
-.network-card svg{width:100%;height:auto;display:block}.edge{stroke:#365271;stroke-width:2;opacity:.7}.pulse{fill:none;stroke:var(--cyan);stroke-width:3;stroke-dasharray:5 16;animation:flow 1.8s linear infinite}.node{fill:#142941;stroke:#65dcd8;stroke-width:2;filter:drop-shadow(0 0 7px #52e0dc66)}.node.alt{stroke:#a88cff}.node.out{stroke:#8ee6b0}.layer-label{fill:#b7c9e4;font-size:14px;font-weight:600}.digit{font:700 27px ui-monospace,monospace;fill:#b6c9e9;opacity:.5;animation:float 4s ease-in-out infinite}.digit:nth-of-type(2n){animation-delay:-2s}@keyframes flow{to{stroke-dashoffset:-42}}@keyframes float{0%,100%{transform:translateY(0);opacity:.25}50%{transform:translateY(-9px);opacity:.8}}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0}.stat,.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}.stat strong{display:block;font-size:1.45rem;color:var(--cyan)}.stat span{color:var(--muted);font-size:.86rem}
-section{margin-top:42px}h2{font-size:1.55rem;margin:0 0 16px}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.card h3{margin:0 0 8px;font-size:1.02rem}.card p{margin:0;color:var(--muted);font-size:.94rem}.tag{display:inline-block;margin:6px 5px 0 0;border:1px solid #34506d;border-radius:7px;padding:3px 8px;color:#b9d9ee;font-size:.78rem}
-.flow{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding:20px;background:#0c1525;border:1px solid var(--line);border-radius:16px}.step{padding:10px 14px;border-radius:10px;background:#162740;border:1px solid #315170;color:#dcecff;font-weight:650}.arrow{color:var(--cyan);font-size:1.2rem}
-pre{white-space:pre-wrap;overflow:auto;background:#070c15;border:1px solid #263951;border-radius:12px;padding:16px;color:#bfe8e3;font-size:.88rem}
-footer{margin-top:50px;padding-top:22px;border-top:1px solid var(--line);color:var(--muted);font-size:.88rem}
-@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.hero{padding-top:30px}.network-card{padding:8px}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
-</style>
-</head>
-<body>
-<div class="wrap">
-<nav><div class="brand">MLP / MNIST</div><span class="pill">NUMPY · FROM SCRATCH</span></nav>
-<header class="hero">
-<div class="eyebrow">Neural Network Project</div>
-<h1>Learning to Recognize<br>Handwritten Digits</h1>
-<p>A Multilayer Perceptron implemented with NumPy, trained on MNIST, and validated with numerical gradient checking.</p>
-</header>
-<div class="network-card" aria-label="Animated neural network showing input, hidden layers and ten output classes">
-<svg viewBox="0 0 860 330" role="img">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#52e0dc"/><stop offset="1" stop-color="#bd8cff"/></linearGradient></defs>
-<g class="digit"><text x="30" y="65">7</text><text x="790" y="70">3</text><text x="50" y="280">8</text><text x="780" y="275">1</text></g>
-<g>
-<path class="edge" d="M110 115 L300 75 M110 115 L300 165 M110 115 L300 255 M110 215 L300 75 M110 215 L300 165 M110 215 L300 255"/>
-<path class="edge" d="M300 75 L520 75 M300 75 L520 165 M300 165 L520 75 M300 165 L520 165 M300 255 L520 165 M300 255 L520 255"/>
-<path class="edge" d="M520 75 L735 55 M520 75 L735 110 M520 165 L735 165 M520 255 L735 220 M520 255 L735 275"/>
-<path class="pulse" d="M110 115 L300 75 L520 75 L735 55 M110 215 L300 165 L520 165 L735 165 M110 215 L300 255 L520 255 L735 275"/>
-</g>
-<g>
-<circle class="node" cx="110" cy="115" r="17"/><circle class="node" cx="110" cy="215" r="17"/>
-<circle class="node alt" cx="300" cy="75" r="19"/><circle class="node alt" cx="300" cy="165" r="19"/><circle class="node alt" cx="300" cy="255" r="19"/>
-<circle class="node alt" cx="520" cy="75" r="19"/><circle class="node alt" cx="520" cy="165" r="19"/><circle class="node alt" cx="520" cy="255" r="19"/>
-<circle class="node out" cx="735" cy="55" r="12"/><circle class="node out" cx="735" cy="110" r="12"/><circle class="node out" cx="735" cy="165" r="12"/><circle class="node out" cx="735" cy="220" r="12"/><circle class="node out" cx="735" cy="275" r="12"/>
-</g>
-<g class="layer-label"><text x="65" y="310">INPUT · 784</text><text x="245" y="310">DENSE · 128</text><text x="465" y="310">DENSE · 64</text><text x="690" y="310">OUTPUT · 10</text></g>
-</svg>
-</div>
-<div class="stats">
-<div class="stat"><strong>784</strong><span>Input features (28 × 28)</span></div>
-<div class="stat"><strong>128 → 64</strong><span>Hidden neurons</span></div>
-<div class="stat"><strong>10</strong><span>Digit classes (0–9)</span></div>
-<div class="stat"><strong>NumPy</strong><span>Core implementation</span></div>
-</div>
-<section>
-<h2>Project overview</h2>
-<p class="muted">This project builds the essential components of a feed-forward neural network without using a machine-learning framework for the core model. NumPy handles matrix operations, while gradients and parameter updates are implemented manually.</p>
-<div class="grid">
-<div class="card"><h3>Dense layers</h3><p>Fully connected transformations using <code>Z = XW + b</code>, with He weight initialization.</p></div>
-<div class="card"><h3>Forward propagation</h3><p>Data passes through dense layers and ReLU activations to produce class probabilities with Softmax.</p></div>
-<div class="card"><h3>Backpropagation</h3><p>The chain rule computes gradients for weights and biases, starting from Softmax plus cross-entropy.</p></div>
-<div class="card"><h3>Mini-batch SGD</h3><p>Shuffled mini-batches are used to calculate gradients and update trainable parameters.</p></div>
-<div class="card"><h3>Gradient checking</h3><p>Analytical derivatives are compared with central finite-difference estimates on a small synthetic batch.</p></div>
-<div class="card"><h3>PyTorch comparison</h3><p>A separate PyTorch model provides a framework-based reference; it is not used by the NumPy model.</p></div>
-</div>
-</section>
-<section>
-<h2>Model data flow</h2>
-<div class="flow"><span class="step">28 × 28 image</span><span class="arrow">→</span><span class="step">Flatten · 784</span><span class="arrow">→</span><span class="step">Dense 128 + ReLU</span><span class="arrow">→</span><span class="step">Dense 64 + ReLU</span><span class="arrow">→</span><span class="step">Dense 10</span><span class="arrow">→</span><span class="step">Softmax</span></div>
-</section>
-<section>
-<h2>Technology stack</h2>
-<span class="tag">Python</span><span class="tag">NumPy</span><span class="tag">MNIST IDX</span><span class="tag">Matplotlib</span><span class="tag">PyTorch comparison</span><span class="tag">Google Colab</span>
-</section>
-<section>
-<h2>Run the project</h2>
-<ol class="muted">
-<li>Open <a href="https://colab.research.google.com/">Google Colab</a>.</li>
-<li>Upload <code>MLP_From_Scratch_MNIST_Bluebook.ipynb</code>.</li>
-<li>Run the notebook cells in order.</li>
-<li>Allow the MNIST files to download when the loader runs.</li>
-<li>Run the NumPy training experiment and review the printed metrics.</li>
-<li>Optionally run the separate PyTorch comparison cell.</li>
-</ol>
-<p class="muted">A GPU is optional. The core NumPy implementation runs on CPU; a GPU runtime does not automatically accelerate NumPy calculations.</p>
-</section>
-<section>
-<h2>Training configuration</h2>
-<pre>Epochs       : 5
-Batch size   : 128
-Learning rate: 0.1
-Architecture : 784 → 128 → 64 → 10
-Optimizer    : Mini-batch SGD
-Loss         : Cross-entropy</pre>
-</section>
-<section>
-<h2>Results</h2>
-<p class="muted">Populate this section with values observed from your own notebook execution. Do not invent accuracy, loss, or runtime.</p>
-<div class="grid">
-<div class="card"><h3>Test accuracy</h3><p>To be filled after execution</p></div>
-<div class="card"><h3>Test loss</h3><p>To be filled after execution</p></div>
-<div class="card"><h3>Gradient-check error</h3><p>To be filled after execution</p></div>
-<div class="card"><h3>Training runtime</h3><p>To be filled after execution</p></div>
-</div>
-</section>
-<section>
-<h2>Repository files</h2>
-<pre>MLP-From-Scratch-MNIST/
-├── MLP_From_Scratch_MNIST_Bluebook.ipynb
+import numpy as np
+```
+
+The separate PyTorch comparison uses these additional imports:
+
+```python
+import torch
+from torch import nn
+from torch.utils.data import DataLoader
+from torchvision import datasets, transforms
+```
+
+PyTorch and torchvision are needed only if the optional comparison experiment is run.
+
+## 10. Project Structure
+
+The following is a suggested repository structure. Adjust the filenames to match the files actually present in your repository.
+
+```text
+MLP-From-Scratch-MNIST/
+│
 ├── README.md
-└── index.html   # Animated project overview</pre>
-</section>
-<footer>
-<strong>Academic project:</strong> Multilayer Perceptron (MLP) From Scratch Using MNIST<br>
-<strong>Student:</strong> Add your name &nbsp;·&nbsp; <strong>Roll No.:</strong> Add your roll number<br>
-<span>Built for learning the fundamentals of neural-network training.</span>
-</footer>
-</div>
-</body>
-</html>'''
+├── MLP_From_Scratch_MNIST_Bluebook.ipynb
+│
+├── assets/
+│   ├── mlp-architecture.png
+│   └── mlp-animation.gif
+│
+├── data/
+│   └── mnist/
+│
+├── results/
+│   ├── training-results.png
+│   ├── prediction-examples.png
+│   └── gradient-check.txt
+│
+└── LICENSE
+```
 
-html_path = "/mnt/data/MLP_MNIST_Animated_Project_Overview.html"
-Path(html_path).write_text(html, encoding="utf-8")
+The `assets`, `data`, `results`, and `LICENSE` entries are suggested. Include them only if you create or add those files. The notebook's data loader can download MNIST into `data/mnist` when it is run.
 
-zip_path = "/mnt/data/MLP_MNIST_Animated_Project_Files.zip"
-with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
-    z.writestr("index.html", html)
-    z.writestr("README.md", """# MLP From Scratch Using MNIST
+## 11. How to Run the Project
 
-See `index.html` for the animated HTML/CSS/SVG project overview (no GIF or video).
+### Option A: Google Colab
 
-Core implementation: `MLP_From_Scratch_MNIST_Bluebook.ipynb` (download separately from the project conversation).
+1. Open Google Colab.
+2. Upload `MLP_From_Scratch_MNIST_Bluebook.ipynb`.
+3. Select a Python runtime.
+4. Run the notebook cells in order.
+5. Allow the notebook to download the MNIST dataset when prompted by execution.
+6. Run the gradient-checking cell.
+7. Run the NumPy training and evaluation cells.
+8. Run the optional PyTorch comparison separately if required.
+9. Record the actual output metrics and save relevant screenshots.
 
-Open `index.html` in a browser to view the animated overview. For GitHub Pages, place `index.html` in the repository root and enable Pages for the branch.
-""")
-print("Created:", html_path, os.path.getsize(html_path), "bytes")
-print("Created:", zip_path, os.path.getsize(zip_path), "bytes")
+The NumPy model uses CPU-based NumPy operations. Selecting a GPU runtime does not automatically make the NumPy model run on the GPU. The separate PyTorch experiment can select an available CUDA device.
+
+### Option B: Local Python Environment
+
+Install NumPy:
+
+```bash
+python -m pip install numpy
+```
+
+Run the Python source file if you have saved the complete implementation as a `.py` file:
+
+```bash
+python your_script_name.py
+```
+
+For the optional PyTorch comparison, install compatible versions of PyTorch and torchvision following the official PyTorch installation instructions.
+
+## 12. Testing and Validation
+
+The project should be checked using the following tests:
+
+| Test | Expected verification |
+|---|---|
+| Forward-pass shape | Output has shape `(batch_size, 10)` |
+| Softmax | Each image's probabilities sum approximately to 1 |
+| Gradient checking | Analytical and numerical gradients have a small relative error |
+| Training | Training loss and test metrics are produced |
+| Evaluation | Test loss and test accuracy are calculated |
+| Prediction | Model predicts a digit class from 0 to 9 |
+
+Example forward-pass checks:
+
+```python
+sample = np.random.default_rng(1).random((4, 784), dtype=np.float32)
+probabilities = model.forward(sample)
+
+assert probabilities.shape == (4, 10)
+assert np.allclose(probabilities.sum(axis=1), 1.0)
+
+print("Forward-pass tests passed.")
+```
+
+## 13. Results
+
+Enter the values obtained from your actual notebook execution. Do not use estimated or invented results.
+
+| Metric | Actual result |
+|---|---|
+| Number of epochs | `Enter observed value` |
+| Batch size | `Enter observed value` |
+| Learning rate | `Enter observed value` |
+| Final training loss | `Enter observed value` |
+| Final test loss | `Enter observed value` |
+| Test accuracy | `Enter observed value` |
+| Maximum gradient-check relative error | `Enter observed value` |
+| Training runtime | `Enter observed value` |
+
+Add screenshots of the training output, gradient-check output, and sample predictions to the `results/` folder if you want to display them in this README.
+
+## 14. Expected Learning Outcomes
+
+After completing this project, the learner should be able to:
+
+- Explain the architecture of a basic feed-forward neural network.
+- Implement dense layers and activation functions using NumPy.
+- Describe how forward propagation generates predictions.
+- Explain how backpropagation calculates gradients.
+- Understand how gradient descent updates weights and biases.
+- Load and preprocess image data for classification.
+- Validate manually calculated gradients using numerical approximation.
+- Evaluate a classifier using test loss and accuracy.
+- Understand the difference between manual gradient computation and automatic differentiation in PyTorch.
+
+## 15. Limitations
+
+- The model is a fully connected MLP, not a Convolutional Neural Network (CNN).
+- The primary implementation uses NumPy and does not automatically use GPU acceleration.
+- The model is designed for the MNIST handwritten-digit classification task.
+- Performance depends on training settings such as epochs, batch size, learning rate, and initialization.
+- The PyTorch comparison may produce different results because of differences in initialization and training details.
+
+## 16. Future Improvements
+
+- Experiment with different hidden-layer sizes and learning rates.
+- Add a confusion matrix and per-class evaluation.
+- Display more correctly and incorrectly classified examples.
+- Compare the MLP with a CNN on MNIST.
+- Experiment with optimizers such as Momentum and Adam.
+- Save and reload trained model parameters.
+- Add a simple interface for predicting user-drawn digits.
+
+## 17. Conclusion
+
+This project demonstrates how a Multilayer Perceptron can be implemented and trained from scratch using NumPy. By manually implementing dense layers, forward propagation, activation functions, cross-entropy loss, backpropagation, and mini-batch SGD, the project provides a practical understanding of the core operations behind neural-network training.
+
+The MNIST dataset provides a standard handwritten-digit classification task for evaluating the implementation. Numerical gradient checking helps validate the manually computed gradients, while a separate PyTorch experiment provides a framework-based reference for comparison.
+
+---
+
+## References
+
+- LeCun, Y., Cortes, C., and Burges, C. J. C. — *The MNIST Database of Handwritten Digits*.
+- NumPy documentation: https://numpy.org/doc/
+- PyTorch documentation: https://pytorch.org/docs/
+- Google Colab: https://colab.research.google.com/
+
+---
+
+**Before submitting:** Replace all student-information placeholders, run the notebook from beginning to end, enter your actual results, and make sure the repository structure and image links match the files you have uploaded.
