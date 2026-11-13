@@ -414,7 +414,3 @@ The MNIST dataset provides a standard handwritten-digit classification task for 
 - NumPy documentation: https://numpy.org/doc/
 - PyTorch documentation: https://pytorch.org/docs/
 - Google Colab: https://colab.research.google.com/
-
----
-
-**Before submitting:** Replace all student-information placeholders, run the notebook from beginning to end, enter your actual results, and make sure the repository structure and image links match the files you have uploaded.
