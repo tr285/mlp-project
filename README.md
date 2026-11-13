@@ -20,7 +20,7 @@ Explore the animated neural network architecture and project overview.
 - Data flow visualization
 - MLP architecture overview
 
-[🌐 View Animated Project](https://tr285.github.io/MLP_MNIST_Animated_Project_Overview/)
+[🌐 View Animated Project](https://mlp-project-mu.vercel.app/)
 
 ## Project Information
 
