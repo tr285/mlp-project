@@ -1,4 +1,3 @@
-[README (2).md](https://github.com/user-attachments/files/34814901/README.2.md)
 # Multilayer Perceptron (MLP) From Scratch Using MNIST
 
 > **A neural-network implementation built with NumPy to understand the internal working of a Multilayer Perceptron — from forward propagation and backpropagation to training and evaluation.**
